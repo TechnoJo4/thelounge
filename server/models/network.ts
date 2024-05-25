@@ -86,6 +86,7 @@ export type NetworkConfig = {
 	proxyEnabled: boolean;
 	highlightRegex?: string;
 	ignoreList: any[];
+	keys: { [key: string]: string };
 };
 
 class Network {
@@ -130,6 +131,8 @@ class Network {
 		NETWORK: string;
 	};
 
+	keys!: { [key: string]: string };
+
 	// TODO: this is only available on export
 	hasSTSPolicy!: boolean;
 
@@ -173,6 +176,8 @@ class Network {
 			chanCache: [],
 			ignoreList: [],
 			keepNick: null,
+
+			keys: {},
 		});
 
 		if (!this.uuid) {
@@ -630,6 +635,8 @@ class Network {
 			"proxyUsername",
 			"proxyEnabled",
 			"proxyPassword",
+
+			"keys",
 		]) as Network;
 
 		network.channels = this.channels
@@ -637,15 +644,15 @@ class Network {
 				return channel.type === ChanType.CHANNEL || channel.type === ChanType.QUERY;
 			})
 			.map(function (chan) {
-				const keys = ["name", "muted"];
+				const k = ["name", "muted"];
 
 				if (chan.type === ChanType.CHANNEL) {
-					keys.push("key");
+					k.push("key");
 				} else if (chan.type === ChanType.QUERY) {
-					keys.push("type");
+					k.push("type");
 				}
 
-				return _.pick(chan, keys);
+				return _.pick(chan, k);
 				// Override the type because we're omitting ID
 			}) as Channel[];
 

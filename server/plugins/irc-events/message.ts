@@ -9,6 +9,8 @@ import {MessageType} from "../../../shared/types/msg";
 import {ChanType} from "../../../shared/types/chan";
 import {MessageEventArgs} from "irc-framework";
 
+import {tryDecrypt} from "../fishlim/decrypt";
+
 const nickRegExp = /(?:\x03[0-9]{1,2}(?:,[0-9]{1,2})?)?([\w[\]\\`^{|}-]+)/g;
 
 type HandleInput = {
@@ -122,6 +124,9 @@ export default <IrcEventHandler>function (irc, network) {
 				from.lastMessage = data.time || Date.now();
 			}
 		}
+
+		const decrypted = tryDecrypt(data.message, chan.name, network);
+		if (decrypted) data.message = decrypted;
 
 		// msg is constructed down here because `from` is being copied in the constructor
 		const msg = new Msg({

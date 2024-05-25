@@ -3,6 +3,8 @@ import {IrcEventHandler} from "../../client";
 import Msg from "../../models/msg";
 import {MessageType} from "../../../shared/types/msg";
 
+import {tryDecrypt} from "../fishlim/decrypt";
+
 export default <IrcEventHandler>function (irc, network) {
 	const client = this;
 
@@ -12,6 +14,9 @@ export default <IrcEventHandler>function (irc, network) {
 		if (typeof chan === "undefined") {
 			return;
 		}
+
+		const decrypted = tryDecrypt(data.topic, data.channel, network);
+		if (decrypted) data.topic = decrypted;
 
 		const msg = new Msg({
 			time: data.time,
